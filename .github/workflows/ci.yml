@@ -1,7 +1,8 @@
 name: CI
 on:
   workflow_dispatch:
-
+  schedule:
+    - cron: "0 0 22/4 ? * * *"
 
 
 jobs:
