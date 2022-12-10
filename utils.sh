@@ -122,7 +122,7 @@ patch_apk() {
 	local stock_input=$1 patched_apk=$2 patcher_args=$3
 	# --rip-lib is only available in my own revanced-cli builds
 	declare -r tdir=$(mktemp -d -p $TEMP_DIR)
-	local cmd="java -jar $RV_CLI_JAR --temp-dir=$tdir --rip-lib x86 --rip-lib armeabi-v7a --rip-lib x86_64 -c -a $stock_input -o $patched_apk -b $RV_PATCHES_JAR --keystore=ks.keystore $patcher_args"
+	local cmd="java -jar $RV_CLI_JAR --temp-dir=$tdir --rip-lib arm64-v8a --rip-lib armeabi-v7a --rip-lib x86 --rip-lib x86_64 -c -a $stock_input -o $patched_apk -b $RV_PATCHES_JAR --keystore=ks.keystore $patcher_args"
 	echo "$cmd"
 	eval "$cmd"
 }
@@ -278,7 +278,7 @@ build_youtube() {
 	youtube_args[app_name]="YouTube"
 	youtube_args[patcher_args]="-m ${RV_INTEGRATIONS_APK} $(join_args "${YOUTUBE_EXCLUDED_PATCHES}" -e) $(join_args "${YOUTUBE_INCLUDED_PATCHES}" -i)"
 	youtube_args[mode]="$YOUTUBE_MODE"
-	youtube_args[microg_patch]="microg-support"
+	youtube_args[microg_patch]="client-spoof"
 	youtube_args[pkg_name]="com.google.android.youtube"
 	youtube_args[rip_all_libs]=true
 	youtube_args[apkmirror_dlurl]="google-inc/youtube"
