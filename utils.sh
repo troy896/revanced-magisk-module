@@ -22,17 +22,17 @@ json_get() {
 
 get_prebuilts() {
 	echo "Getting prebuilts"
-	RV_CLI_URL=$(req https://api.github.com/repos/j-hc/revanced-cli/releases/latest - | json_get 'browser_download_url')
+	RV_CLI_URL=$(req https://api.github.com/repos/inotia00/revanced-cli/releases/latest - | json_get 'browser_download_url')
 	RV_CLI_JAR="${TEMP_DIR}/${RV_CLI_URL##*/}"
 	log "CLI: ${RV_CLI_URL##*/}"
 
-	RV_INTEGRATIONS_URL=$(req https://api.github.com/repos/revanced/revanced-integrations/releases/latest - | json_get 'browser_download_url')
+	RV_INTEGRATIONS_URL=$(req https://api.github.com/repos/inotia00/revanced-integrations/releases/latest - | json_get 'browser_download_url')
 	RV_INTEGRATIONS_APK=${RV_INTEGRATIONS_URL##*/}
 	RV_INTEGRATIONS_APK="${RV_INTEGRATIONS_APK%.apk}-$(cut -d/ -f8 <<<"$RV_INTEGRATIONS_URL").apk"
 	log "Integrations: $RV_INTEGRATIONS_APK"
 	RV_INTEGRATIONS_APK="${TEMP_DIR}/${RV_INTEGRATIONS_APK}"
 
-	RV_PATCHES=$(req https://api.github.com/repos/revanced/revanced-patches/releases/latest -)
+	RV_PATCHES=$(req https://api.github.com/repos/anddea/revanced-patches/releases/latest -)
 	RV_PATCHES_CHANGELOG=$(echo "$RV_PATCHES" | json_get 'body' | sed 's/\(\\n\)\+/\\n/g')
 	RV_PATCHES_URL=$(echo "$RV_PATCHES" | json_get 'browser_download_url' 'jar')
 	RV_PATCHES_JAR="${TEMP_DIR}/${RV_PATCHES_URL##*/}"
@@ -45,8 +45,8 @@ get_prebuilts() {
 }
 
 get_cmpr() {
-	dl_if_dne "${MODULE_TEMPLATE_DIR}/bin/arm64/cmpr" "https://github.com/j-hc/cmpr/releases/download/20220811/cmpr-arm64-v8a"
-	dl_if_dne "${MODULE_TEMPLATE_DIR}/bin/arm/cmpr" "https://github.com/j-hc/cmpr/releases/download/20220811/cmpr-armeabi-v7a"
+	dl_if_dne "${MODULE_TEMPLATE_DIR}/bin/arm64/cmpr" "https://github.com/j-hc/cmpr/releases/download/20240303/cmpr-arm64-v8a"
+	dl_if_dne "${MODULE_TEMPLATE_DIR}/bin/arm/cmpr" "https://github.com/j-hc/cmpr/releases/download/20240303/cmpr-armeabi-v7a"
 }
 
 abort() { echo "abort: $1" && exit 1; }
@@ -122,7 +122,7 @@ patch_apk() {
 	local stock_input=$1 patched_apk=$2 patcher_args=$3
 	# --rip-lib is only available in my own revanced-cli builds
 	declare -r tdir=$(mktemp -d -p $TEMP_DIR)
-	local cmd="java -jar $RV_CLI_JAR --temp-dir=$tdir --rip-lib arm64-v8a --rip-lib armeabi-v7a --rip-lib x86 --rip-lib x86_64 -c -a $stock_input -o $patched_apk -b $RV_PATCHES_JAR --keystore=ks.keystore $patcher_args"
+	local cmd="java -jar $RV_CLI_JAR --temp-dir=$tdir --rip-lib armeabi-v7a --rip-lib x86 --rip-lib x86_64 -c -a $stock_input -o $patched_apk -b $RV_PATCHES_JAR --keystore=ks.keystore $patcher_args"
 	echo "$cmd"
 	eval "$cmd"
 }
@@ -190,7 +190,7 @@ build_rv() {
 			if [ "${args[rip_all_libs]:-}" = true ]; then
 				# --unsigned is only available in my revanced-cli builds
 				# native libraries are already extracted. remove them all to keep apks smol
-				patcher_args="$patcher_args --unsigned --rip-lib arm64-v8a --rip-lib armeabi-v7a"
+				patcher_args="$patcher_args --unsigned --rip-lib armeabi-v7a"
 			else
 				patcher_args="$patcher_args --unsigned"
 			fi
@@ -280,7 +280,7 @@ build_youtube() {
 	youtube_args[mode]="$YOUTUBE_MODE"
 	youtube_args[microg_patch]="client-spoof"
 	youtube_args[pkg_name]="com.google.android.youtube"
-	youtube_args[rip_all_libs]=true
+	youtube_args[rip_all_libs]=false
 	youtube_args[apkmirror_dlurl]="google-inc/youtube"
 	youtube_args[regexp]="APK</span>[^@]*@\([^#]*\)"
 	youtube_args[module_prop_name]="ytrv-magisk"
